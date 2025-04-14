@@ -9,7 +9,9 @@
 >"Start Early, Start Often"  - CSE Department  
 
 ## Team Members:  
-[Team Intro](./videos/teamintro.mp4)
+<video width="640" controls>
+  <source src="./videos/teamintro.mp4" type="video/mp4">
+</video>
 
 - [Elvin Li](https://elvinlit.github.io/110-profile/)  
   - 3rd Year Math-CS  
