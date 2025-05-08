@@ -1,0 +1,177 @@
+## Directory Guide
+Card Game Project  
+├── src  
+│   ├── components  
+│   │   ├── Card.js             // Handles individual card logic and rendering  
+│   │   ├── Deck.js             // Manages the player's deck  
+│   │   ├── Hand.js             // Manages the player's hand  
+│   │   ├── Discard.js          // Manages the discard pile  
+│   │   ├── Player.js           // Handles player-related logic  
+│   │   └── Enemy.js            // Handles enemy-related logic  
+│   ├── game  
+│   │   ├── battle.js           // Manages the overall game state  
+│   │   ├── CardManager.js      // Handles card-related operations  
+│   │   ├── DeckManager.js      // Handles deck-related operations  
+│   │   ├── HandManager.js      // Handles hand-related operations  
+│   │   └── EnemyManager.js     // Manages enemy behaviors and interactions  
+│   ├── assets  
+│   │   ├── cards               // Images or data for cards  
+│   │   ├── enemies             // Images or data for enemies  
+│   │   └── players             // Images or data for players  
+│   ├── styles  
+│   │   ├── main.css            // Styling for the game front page  
+│   │   ├── card.css            // Styling for cards  
+│   │   ├── deck.css            // Styling for the deck  
+│   │   └── hand.css            // Styling for the hand  
+│   └── app.js       // Main entry point for the game logic, contains event listeners  
+├── tests  
+│   └── [Unit tests]  
+├── public  
+│   └── index.html              // Front page of game  
+├── package.json                // Project dependencies and scripts  
+├── README.md                    
+└── .gitignore                  
+## MVP
+#Card system
+Implement card.js
+Represents a generic individual card
+Handles the data and behavior of a single card, such as:
+Card properties (name, type, cost, description, effect)
+render()
+Method for triggering the card's effects when played.
+Implement CardManager.js
+Handles higher-level, generic logic related to cards that is not tied to a specific collection, such as:
+shuffle(cards)
+draw(cards, number)
+Should call Deck.draw() for a card then Hand.add() it to the hand
+moveCard(card, fromCollection, toCollection) For moving cards between deck, hand, discard etc.
+filterCards(cards, condition) - for filtering/searching cards based on a certain criteria
+Implement individual cards
+Individual cards inherit from the generic card class
+We might start with just a few types of cards, like the starter deck given in Slay the Spire which has 1× Bash, 5× Strikes, 4× Defends. Our stretch goal can be adding more types of cards with advanced mechanics.
+A card’s play() calls functions like Enemy.takeDamage() or Player.gainBlock()
+
+##Deck, hand, discard
+Implement deck.js
+An array of any number of cards, represents the player's deck as a distinct entity in the game
+Manages the state and behavior of the deck specifically.
+Tracks the cards currently in the deck.
+Delegates operations like shuffling or drawing to CardManager.js
+Is an array of card objects
+addCard(card) adds a card to the deck
+removeCard(card) removes a card from the deck
+drawCard pops and returns a card from the deck
+Implement hand.js
+An array of 5 cards, represents the player's deck as a distinct entity in the game
+Manages the state and behavior of the player's hand.
+Tracks the 5 cards currently in the hand.
+Handles hand-specific logic, such as playing or discarding cards.
+addCard(card) adds a card to the hand
+removeCard(card) removes a card from the hand
+playCard(card, target) plays a card from the hand. Should call the specific card’s own card.play, then this.removeCard(card)
+discardCard(card) moves a card from the hand to the discard pile; 
+Implement discard.js
+Represents the player's discard as a distinct entity in the game
+An array of any number of card objects
+addCard(card) adds a card to the discard pile
+clear() clears the discard pile
+shuffleDiscardIntoDeck(deck) moves all cards from the discard into the deck. Should call CardManager.js’s shuffle method
+Stretch: Animation that allow users to mouse over the discard pile to see an expanded view of all cards, so that the discard can simply be a condensed pile
+
+SUMMARY OF CARD LOGIC: ALL collections (deck, hand, discard) have THEIR OWN add and remove card functions - they just use the array pushing and popping functionality.
+moveCard is a function that does both - it pops from one collection and adds to another, it avoids needing to call add or remove.
+Drawing and discarding require moveCard to be called.
+Collections that have a shuffle method are wrapper functions that call CardManager’s shuffle.
+
+## Player
+Implement player.js
+A player has: current health, max health, current energy, max energy, block, a deck, a hand, and a discard.
+Design player sprite(s)
+takeDamage(amount)
+gainBlock(amount)
+heal(amount)
+die()
+spendEnergy()
+resetEnergy
+drawCards(amount)
+discardCard(card)
+shuffleDeck
+shuffleDiscardIntoDeck()
+When the player takes damage, a red overlay flashes over the sprite for a moment
+When the player attacks or otherwise uses a card, the sprite changes to a different ‘active’ sprite
+Stretch: Animated sprites
+Stretch: Choice of multiple player characters
+PlayerManager.js
+spawnPlayer([all the player’s constructor variables])
+startTurn() resets energy and draws a card at the start of the turn
+endTurn() discards the player’s hand at the end of the turn
+isPlayerDead() checks if player has 0 hp or not
+## Enemy
+Implement enemy.js
+An enemy has a name, HP, attack power, and abilities.
+takeDamage(amount)
+attack(target)
+die() 
+Enemies do not have cards or energy; the actions they take are determined by a simple AI.
+Design enemy sprite
+Stretch: Multiple enemies on the field. This is quite complicated because we have to add targeting rules for all cards
+Implement EnemyManager.js
+This manages all enemies on the field i.e it is an array of enemies
+spawnEnemy(name, health, attackPower, abilities)
+enemyTurn() Has all enemies that are not dead take their turn
+removeDefeatedEnemies() removes enemies once their health is 0
+isAllEnemiesDefeated() checks if all enemies are defeated, if so then player wins
+## Game management
+Implement battle.js
+startGame() - Initializes the game.
+endGame() - Ends the game and displays results.
+startBattle() - Sets up a battle with enemies.
+endBattle() - Ends the current battle.
+nextTurn() - Advances to the next turn (player or enemy).
+isGameOver() - Checks if the game is over. Calls playerManager.isPlayerDead() and enemyManager.isAllEnemiesDefeated(). 
+Implement app.js
+initializeGame() - Sets up the game environment.
+renderUI() - Renders the game UI.
+Calls helper functions like renderEnemies, renderPlayer, renderHand, renderPlayerScore, createCardElement etc. as needed. All in app.js.
+handleInput(input) - Processes player input.
+updateGame() - Updates the game state.
+mainLoop() - Runs the main game loop.
+
+App.js
+  ├── initializeGame()
+  │     └── GameManager.startGame()
+  │           ├── PlayerManager.createPlayer()
+  │           ├── EnemyManager.spawnEnemy()
+  │           └── GameManager.startBattle()
+  │                 └── GameManager.nextTurn()
+  │
+  ├── mainLoop()
+  │     ├── renderUI()
+  │     └── GameManager.updateGame()
+  │           ├── GameState.isGameOver()
+  │           │     ├── PlayerManager.isPlayerDead()
+  │           │     └── EnemyManager.isAllEnemiesDefeated()
+  │           └── GameManager.nextTurn()
+  │
+  └── handleInput(input)
+        ├── PlayerManager.handlePlayerAction()
+        └── GameManager.nextTurn()
+## UI elements
+Design game board
+Design and place: Deck, hand, discard, player, enemy
+A card has a ‘play’ button that is clicked to play it from the hand. (A future stretch goal might be to allow players to drag-and-drop cards to play them.)
+Design HP bar, energy counter
+Design game menu: Start/resume game buttons
+When designing these elements, think about and keep in mind how they get dynamically generated and updated by javascript
+Stretch: High score counter
+Stretch: See card details by hovering/mousing over
+
+## Level progression (Stretch)
+Implement event.js
+Randomly trigger an event after each battle.
+If the player wins the battle, activate a reward event.
+Allow the player to obtain new cards as a reward.
+Display the newly acquired cards to the player.
+Save the player's updated deck locally (e.g., using localStorage or JSON file).
+
+
